@@ -137,10 +137,10 @@
 ;; cons'ed to the front of it.  
 ;; 
 
-(define (partition pivot num-list)
+(define (partition pivot num-list compar)
   (if (null? num-list) '(() ())
-      (let ((split-of-rest (partition pivot (cdr num-list))))
-	(if (< (car num-list) pivot)
+      (let ((split-of-rest (partition pivot (cdr num-list) compar)))
+	(if (compar (car num-list) pivot)
 	    (list (cons (car num-list) (car split-of-rest)) (cadr split-of-rest))
 	    (list (car split-of-rest) (cons (car num-list) (car (cdr split-of-rest))))))))
 
@@ -156,12 +156,12 @@
 ;; together in the proper order.
 ;;
 
-(define (quicksort num-list)
+(define (quicksort num-list compar)
   (if (<= (length num-list) 1) num-list
-      (let ((split (partition (car num-list) (cdr num-list))))
-	(append (quicksort (car split)) 
+      (let ((split (partition (car num-list) (cdr num-list) compar)))
+	(append (quicksort (car split) compar) 
 		(list (car num-list)) 
-		(quicksort (cadr split))))))
+		(quicksort (cadr split) compar)))))
 
 ;;
 ;; Function: remove
@@ -209,6 +209,66 @@
 ;; it to override exisiting definitions and including
 ;; the most recently implemented into the lot.
 ;;
+
+
+; intersection-points
+(define (intersection-points circs) 
+(if (> 2 (length circs)) '()
+ (append (apply append(map (lambda(c) (intersect(car circs) c)) (cdr circs)))
+ (intersection-points(cdr circs)))))
+
+; distance-product
+(define (distance-product p list)
+ (let ((dis (map (lambda (pt2) 
+ (if (equal? pt2 p) 1 (dist p pt2))) list))) 
+ (apply * dis)))
+
+
+; rate-points
+(define (rate-points p) (map (lambda (p1) 
+      (list (distance-product p1 p) p1)) p))
+
+; sort-points 
+(define (sort-points rate) 
+  (quicksort rate (lambda (rp rp1) (> (car rp1) (car rp)))))
+
+; clumped-points
+(define (clumped-points ps) 
+(map cadr (prefix-of-list (sort-points (rate-points ps))
+ (floor (/ (length ps) 2)))))
+
+; average-point
+(define (average-point ps)
+(list (distance-product (make-pt 
+(/ (apply + (map x ps)) (length ps))
+(/ (apply + (map y ps)) (length ps))) ps)
+(make-pt (/ (apply + (map x ps)) (length ps))
+(/ (apply + (map y ps)) (length ps)))))
+
+;best-estimate
+(define (best-estimate guess)
+ (average-point(clumped-points(intersection-points guess))))
+
+; where-am-I
+(define (where-am-i d star) (sort-points
+ (map best-estimate (all-guesses d star))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              
+              
 
 
 
