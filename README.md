@@ -1,4 +1,4 @@
-For detailed problem description and implementation details, see the assignment PDF.
+For detailed problem description and implementation details, see the [assignment PDF](https://github.com/Gdzagaa1/paradigms-07/blob/master/Assignment-7-Where-Am-I.pdf).
 
 # Where Am I?
 
